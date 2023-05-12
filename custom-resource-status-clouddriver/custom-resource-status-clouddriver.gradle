@@ -1,0 +1,84 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlinVersion"
+    }
+}
+
+apply plugin: "io.spinnaker.plugin.service-extension"
+apply plugin: "maven-publish"
+apply plugin: "kotlin"
+apply plugin: 'kotlin-spring'
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://armory.jfrog.io/armory/gradle-dev-local/'
+        credentials {
+            username = "${artifactory_user}"
+            password = "${artifactory_password}"
+        }
+    }
+
+    maven {
+        url 'https://armory.jfrog.io/artifactory/spinnaker/'
+        credentials {
+            username = "${artifactory_user}"
+            password = "${artifactory_password}"
+        }
+    }
+}
+
+spinnakerPlugin {
+    serviceName = "clouddriver"
+    pluginClass = "io.armory.plugin.KubernetesCustomResourceStatusPlugin"
+}
+
+dependencies {
+    compileOnly(platform(group: "io.spinnaker.clouddriver", name: "clouddriver-bom", version: "${clouddriverVersion}"))
+    compileOnly(group: "io.spinnaker.clouddriver", name: "clouddriver-kubernetes")
+    compileOnly(enforcedPlatform(group: "io.spinnaker.kork", name: "kork-bom", version: "${korkVersion}"))
+    compileOnly(group: "io.spinnaker.kork", name: "kork-plugins")
+    compileOnly(group: 'io.spinnaker.kork', name: 'kork-plugins-spring-api')
+
+    implementation 'commons-beanutils:commons-beanutils:1.9.4'
+    compileOnly("io.kubernetes:client-java:$kubernetesClientVersion")
+
+    testImplementation(platform(group: "io.spinnaker.clouddriver", name: "clouddriver-bom", version: "${clouddriverVersion}"))
+    testImplementation(group: "io.spinnaker.clouddriver", name: "clouddriver-web")
+    testImplementation(group: "io.spinnaker.clouddriver", name: "clouddriver-kubernetes")
+    testImplementation(group: "io.spinnaker.clouddriver", name: "clouddriver-api-tck")
+    testImplementation(enforcedPlatform(group: "io.spinnaker.kork", name: "kork-bom", version: "${korkVersion}"))
+    testImplementation(group: "io.spinnaker.kork", name: "kork-plugins-tck")
+    testImplementation(group: "org.springframework.boot", name: "spring-boot-starter-test")
+    testImplementation(group: "org.junit.jupiter", name: "junit-jupiter-api", version: "5.3.1")
+    testImplementation(group: "io.strikt", name: "strikt-core", version: "0.26.1")
+    testImplementation(group: "dev.minutest", name: "minutest", version: "1.10.0")
+    testImplementation(group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.4.2')
+    testImplementation(group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.13.4')
+    testImplementation(group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.13.4')
+    testImplementation(group: 'com.google.guava', name: 'guava', version: '31.1-jre')
+    testCompileOnly("io.kubernetes:client-java:$kubernetesClientVersion")
+
+}
+
+compileKotlin {
+    kotlinOptions {
+        languageVersion = "1.3"
+        jvmTarget = "11"
+    }
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        languageVersion = "1.3"
+        jvmTarget = "11"
+    }
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+}

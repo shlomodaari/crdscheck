@@ -1,0 +1,54 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://armory.jfrog.io/armory/gradle-plugins/'
+            credentials {
+                username = "${artifactory_user}"
+                password = "${artifactory_password}"
+            }
+        }
+    }
+    dependencies {
+    }
+}
+
+plugins {
+    id("io.spinnaker.plugin.bundler").version("$spinnakerGradleVersion")
+    id("com.palantir.git-version").version("0.12.2")
+}
+
+spinnakerBundle {
+    pluginId = "Armory.K8sCustomResourceStatus"
+    description = "A plugin to validate if a Custom Resource deployment is stable in kubernetes"
+    provider = "kubernetes"
+    version = rootProject.version
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://armory.jfrog.io/armory/gradle-dev-local/'
+        credentials {
+            username = "${artifactory_user}"
+            password = "${artifactory_password}"
+        }
+    }
+}
+
+version = normalizedVersion()
+
+subprojects {
+    group = "io.armory.plugin.kubernetes"
+    version = rootProject.version
+}
+
+String normalizedVersion() {
+    String fullVersion = gitVersion()
+    String normalized = fullVersion.split("-").first()
+    if (fullVersion.contains("dirty")) {
+        return "$normalized-SNAPSHOT"
+    } else {
+        return normalized
+    }
+}

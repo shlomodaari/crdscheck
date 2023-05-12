@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: clouddriver
+
+services:
+  fiat:
+    enabled: false
+    baseUrl: http://localhost:7003
+  front50:
+    enabled: true
+    baseUrl: http://localhost:8080
+
+redis:
+  enabled: false
+
+kubernetes:
+  enabled: true
+
+spinnaker:
+  extensibility:
+    plugins-root-path: build/plugins
+    plugins:
+      Armory.K8sCustomResourceStatus:
+        enabled: true
+        config:
+          kind:
+            CronTab:
+              unavailable:
+                conditions:
+                  - message: Resource is reconciling
+                    reason: Reconciling
+                    status: "False"
+                    type: Reconciling
+                  - status: "True"
+                    type: Stalled
+                fields:
+                  - status.availableReplicas: 0
+                    status.collisionCount: 3
+          status:
+            failed:
+              conditions:
+                - message: Resource is reconciling
+                  reason: Reconciling
+                  status: "True"
+                  type: Reconciling
+                - status: "False"
+                  type: Stalled
+              fields:
+                - status.availableReplicas: 0
+                  status.collisionCount: 1
