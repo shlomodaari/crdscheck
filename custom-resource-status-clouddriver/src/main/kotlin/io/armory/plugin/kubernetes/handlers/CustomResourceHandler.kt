@@ -40,9 +40,9 @@ class CustomResourceHandler(private val properties: CustomResourceConfigurationP
         checkFailure(manifest, statusConditions)?.also {
             if (it.statusMatches) result.failed(it.message)
         }
-        checkReplicaCounts(manifest)?.also {
-            result.unstable(it.message)
-        }
+        //checkReplicaCounts(manifest)?.also {
+        //    result.unstable(it.message)
+        //}
 
         return result
     }
@@ -313,35 +313,35 @@ class CustomResourceHandler(private val properties: CustomResourceConfigurationP
      * @param manifest the Kubernetes Manifest
      * @return an [UnstableReason] if the deployment is unstable. Used in [Manifest.Status.unstable]
      */
-//    private fun checkReplicaCounts(manifest: KubernetesManifest): UnstableReason? {
-//        val desiredReplicas = defaultToZero(getProperty(manifest, "spec.replicas"))
-//        val updatedReplicas = defaultToZero(getProperty(manifest, "status.updatedReplicas"))
-//        if (updatedReplicas < desiredReplicas) {
-//            return UnstableReason.UPDATED_REPLICAS
-//        }
-
-//        val statusReplicas = defaultToZero(getProperty(manifest, "status.replicas"))
-//        if (statusReplicas > updatedReplicas) {
-//            return UnstableReason.OLD_REPLICAS
-//        }
-
-//        val availableReplicas = defaultToZero(getProperty(manifest, "status.availableReplicas"))
-//        if (availableReplicas < desiredReplicas) {
-//            return UnstableReason.AVAILABLE_REPLICAS
-//        }
-
-//        val readyReplicas = defaultToZero(getProperty(manifest, "status.readyReplicas"))
-//        if (readyReplicas < desiredReplicas) {
-//            return UnstableReason.READY_REPLICAS
-//        }
-
-//        return null
-//    }
-
-    private fun defaultToZero(input: Any?): Int {
-        return when (input) {
-            is Number -> input.toInt()
-            else -> 0
-        }
-    }
-}
+/**    private fun checkReplicaCounts(manifest: KubernetesManifest): UnstableReason? {
+*        val desiredReplicas = defaultToZero(getProperty(manifest, "spec.replicas"))
+*        val updatedReplicas = defaultToZero(getProperty(manifest, "status.updatedReplicas"))
+*        if (updatedReplicas < desiredReplicas) {
+*            return UnstableReason.UPDATED_REPLICAS
+*        }
+*
+*        val statusReplicas = defaultToZero(getProperty(manifest, "status.replicas"))
+*        if (statusReplicas > updatedReplicas) {
+*            return UnstableReason.OLD_REPLICAS
+*        }
+*
+*        val availableReplicas = defaultToZero(getProperty(manifest, "status.availableReplicas"))
+*        if (availableReplicas < desiredReplicas) {
+*            return UnstableReason.AVAILABLE_REPLICAS
+*        }
+*
+*        val readyReplicas = defaultToZero(getProperty(manifest, "status.readyReplicas"))
+*        if (readyReplicas < desiredReplicas) {
+*            return UnstableReason.READY_REPLICAS
+*        }
+*
+*        return null
+*    }
+*
+*    private fun defaultToZero(input: Any?): Int {
+*        return when (input) {
+*            is Number -> input.toInt()
+*            else -> 0
+*        }
+*    }
+*/}
