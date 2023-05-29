@@ -313,57 +313,42 @@ class CustomResourceHandler(private val properties: CustomResourceConfigurationP
      * @param manifest the Kubernetes Manifest
      * @return an [UnstableReason] if the deployment is unstable. Used in [Manifest.Status.unstable]
      */
-    private fun checkReplicaCounts(manifest: KubernetesManifest): UnstableReason? {
-        val configProperties = CustomResourceConfigurationProperties()
-        if(configProperties.kind != null){
-            if(configurationProperties.kind?.containsKey(kindName) == true){
-                val desiredReplicas = defaultToZero(getProperty(manifest, "spec.replicas"))
-                val updatedReplicas = defaultToZero(getProperty(manifest, "status.updatedReplicas"))
-                if (updatedReplicas < desiredReplicas) {
-                    return UnstableReason.UPDATED_REPLICAS
-                }
+private fun checkReplicaCounts(manifest: KubernetesManifest): UnstableReason? {
+        if (!shouldCheckReplicaCounts(manifest)) return null
 
-                val statusReplicas = defaultToZero(getProperty(manifest, "status.replicas"))
-                if (statusReplicas > updatedReplicas) {
-                    return UnstableReason.OLD_REPLICAS
-                }
+        val desiredReplicas = defaultToZero(getProperty(manifest, "spec.replicas"))
+        val updatedReplicas = defaultToZero(getProperty(manifest, "status.updatedReplicas"))
+        if (updatedReplicas < desiredReplicas) {
+            return UnstableReason.UPDATED_REPLICAS
+        }
 
-                val availableReplicas = defaultToZero(getProperty(manifest, "status.availableReplicas"))
-                if (availableReplicas < desiredReplicas) {
-                    return UnstableReason.AVAILABLE_REPLICAS
-                }
+        val statusReplicas = defaultToZero(getProperty(manifest, "status.replicas"))
+        if (statusReplicas > updatedReplicas) {
+            return UnstableReason.OLD_REPLICAS
+        }
 
-                val readyReplicas = defaultToZero(getProperty(manifest, "status.readyReplicas"))
-                if (readyReplicas < desiredReplicas) {
-                    return UnstableReason.READY_REPLICAS
-                }
-                return null
-            }
-        }else{
-            val desiredReplicas = defaultToZero(getProperty(manifest, "spec.replicas"))
-            val updatedReplicas = defaultToZero(getProperty(manifest, "status.updatedReplicas"))
-            if (updatedReplicas < desiredReplicas) {
-                return UnstableReason.UPDATED_REPLICAS
-            }
+        val availableReplicas = defaultToZero(getProperty(manifest, "status.availableReplicas"))
+        if (availableReplicas < desiredReplicas) {
+            return UnstableReason.AVAILABLE_REPLICAS
+        }
 
-            val statusReplicas = defaultToZero(getProperty(manifest, "status.replicas"))
-            if (statusReplicas > updatedReplicas) {
-                return UnstableReason.OLD_REPLICAS
-            }
-
-            val availableReplicas = defaultToZero(getProperty(manifest, "status.availableReplicas"))
-            if (availableReplicas < desiredReplicas) {
-                return UnstableReason.AVAILABLE_REPLICAS
-            }
-
-            val readyReplicas = defaultToZero(getProperty(manifest, "status.readyReplicas"))
-            if (readyReplicas < desiredReplicas) {
-                return UnstableReason.READY_REPLICAS
-            }
-            return null
+        val readyReplicas = defaultToZero(getProperty(manifest, "status.readyReplicas"))
+        if (readyReplicas < desiredReplicas) {
+            return UnstableReason.READY_REPLICAS
         }
 
         return null
+    }
+
+    /**
+     * We should only check for replica counts if the user is deploying a configured kind
+     * or has configured statutes for all deployments
+     */
+    private fun shouldCheckReplicaCounts(manifest: KubernetesManifest): Boolean {
+        val containsManifestKind = properties.kind?.containsKey(manifest.kindName) == true
+        val hasGeneralStatusConfiguration = properties.status != null
+
+        return containsManifestKind || hasGeneralStatusConfiguration
     }
 
     private fun defaultToZero(input: Any?): Int {
