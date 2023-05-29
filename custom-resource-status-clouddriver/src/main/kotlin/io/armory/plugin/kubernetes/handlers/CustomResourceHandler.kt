@@ -314,25 +314,53 @@ class CustomResourceHandler(private val properties: CustomResourceConfigurationP
      * @return an [UnstableReason] if the deployment is unstable. Used in [Manifest.Status.unstable]
      */
     private fun checkReplicaCounts(manifest: KubernetesManifest): UnstableReason? {
-        val desiredReplicas = defaultToZero(getProperty(manifest, "spec.replicas"))
-        val updatedReplicas = defaultToZero(getProperty(manifest, "status.updatedReplicas"))
-        if (updatedReplicas < desiredReplicas) {
-            return UnstableReason.UPDATED_REPLICAS
-        }
+        val configProperties = CustomResourceConfigurationProperties()
+        if(configProperties.kind != null){
+            if(configurationProperties.kind?.containsKey(kindName) == true){
+                val desiredReplicas = defaultToZero(getProperty(manifest, "spec.replicas"))
+                val updatedReplicas = defaultToZero(getProperty(manifest, "status.updatedReplicas"))
+                if (updatedReplicas < desiredReplicas) {
+                    return UnstableReason.UPDATED_REPLICAS
+                }
 
-        val statusReplicas = defaultToZero(getProperty(manifest, "status.replicas"))
-        if (statusReplicas > updatedReplicas) {
-            return UnstableReason.OLD_REPLICAS
-        }
+                val statusReplicas = defaultToZero(getProperty(manifest, "status.replicas"))
+                if (statusReplicas > updatedReplicas) {
+                    return UnstableReason.OLD_REPLICAS
+                }
 
-        val availableReplicas = defaultToZero(getProperty(manifest, "status.availableReplicas"))
-        if (availableReplicas < desiredReplicas) {
-            return UnstableReason.AVAILABLE_REPLICAS
-        }
+                val availableReplicas = defaultToZero(getProperty(manifest, "status.availableReplicas"))
+                if (availableReplicas < desiredReplicas) {
+                    return UnstableReason.AVAILABLE_REPLICAS
+                }
 
-        val readyReplicas = defaultToZero(getProperty(manifest, "status.readyReplicas"))
-        if (readyReplicas < desiredReplicas) {
-            return UnstableReason.READY_REPLICAS
+                val readyReplicas = defaultToZero(getProperty(manifest, "status.readyReplicas"))
+                if (readyReplicas < desiredReplicas) {
+                    return UnstableReason.READY_REPLICAS
+                }
+                return null
+            }
+        }else{
+            val desiredReplicas = defaultToZero(getProperty(manifest, "spec.replicas"))
+            val updatedReplicas = defaultToZero(getProperty(manifest, "status.updatedReplicas"))
+            if (updatedReplicas < desiredReplicas) {
+                return UnstableReason.UPDATED_REPLICAS
+            }
+
+            val statusReplicas = defaultToZero(getProperty(manifest, "status.replicas"))
+            if (statusReplicas > updatedReplicas) {
+                return UnstableReason.OLD_REPLICAS
+            }
+
+            val availableReplicas = defaultToZero(getProperty(manifest, "status.availableReplicas"))
+            if (availableReplicas < desiredReplicas) {
+                return UnstableReason.AVAILABLE_REPLICAS
+            }
+
+            val readyReplicas = defaultToZero(getProperty(manifest, "status.readyReplicas"))
+            if (readyReplicas < desiredReplicas) {
+                return UnstableReason.READY_REPLICAS
+            }
+            return null
         }
 
         return null
