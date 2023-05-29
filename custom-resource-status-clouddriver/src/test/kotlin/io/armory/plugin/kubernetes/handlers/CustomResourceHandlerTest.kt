@@ -594,8 +594,8 @@ class CustomResourceHandlerTest : JUnit5Minutests {
 
             expectThat(unavailableSubjectFieldByKind.status(manifest)).isA<Manifest.Status>().and {
                 get { stable.isState }.isFalse()
-                get { stable.message }.isEqualTo("Waiting for old replicas to finish termination")
-                get { available.isState }.isFalse()
+                get { stable.message }.isEqualTo("Waiting for all replicas to be ready")
+                get { available.isState }.isTrue()
                 get { paused.isState }.isFalse()
                 get { failed.isState }.isFalse()
             }
