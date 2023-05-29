@@ -512,7 +512,7 @@ class CustomResourceHandlerTest : JUnit5Minutests {
             val manifest = KubernetesManifest().apply {
                 apiVersion = KubernetesApiVersion.fromString("spinnaker.io/v1alpha1")
                 put("metadata", mutableMapOf("annotations" to null))
-                kind = KubernetesKind.fromString("SpinnakerService")
+                kind = KubernetesKind.fromString("CronTab")
                 put(
                     "spec",
                     mapOf(
@@ -547,6 +547,52 @@ class CustomResourceHandlerTest : JUnit5Minutests {
             }
 
             expectThat(unavailableSubjectCondition.status(manifest)).isA<Manifest.Status>().and {
+                get { stable.isState }.isFalse()
+                get { stable.message }.isEqualTo("Waiting for old replicas to finish termination")
+                get { available.isState }.isFalse()
+                get { paused.isState }.isFalse()
+                get { failed.isState }.isFalse()
+            }
+        }
+        test("ReplicaCount") {
+            val manifest = KubernetesManifest().apply {
+                apiVersion = KubernetesApiVersion.fromString("spinnaker.io/v1alpha1")
+                put("metadata", mutableMapOf("annotations" to null))
+                kind = KubernetesKind.fromString("SpinnakerService")
+                put(
+                    "spec",
+                    mapOf(
+                        "replicas" to 100,
+                        "container" to listOf(
+                            mapOf(
+                                "image" to "nginx:1.7.9",
+                                "imagePullPolicy" to "IfNotPresent",
+                                "name" to "nginx"
+                            )
+                        )
+                    )
+                )
+                put(
+                    "status",
+                    mapOf(
+                        "conditions" to listOf(
+                            mapOf(
+                                "message" to "Deployment unavailable",
+                                "reason" to "deploymentunavailable",
+                                "status" to "False",
+                                "type" to "Ready"
+                            )
+                        ),
+                        "availableReplicas" to 75,
+                        "readyReplicas" to 60,
+                        "replicas" to 114,
+                        "unavailableReplicas" to 39,
+                        "updatedReplicas" to 100
+                    )
+                )
+            }
+
+            expectThat(unavailableSubjectFieldByKind.status(manifest)).isA<Manifest.Status>().and {
                 get { stable.isState }.isFalse()
                 get { stable.message }.isEqualTo("Waiting for old replicas to finish termination")
                 get { available.isState }.isFalse()
