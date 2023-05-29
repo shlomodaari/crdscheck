@@ -554,11 +554,11 @@ class CustomResourceHandlerTest : JUnit5Minutests {
                 get { failed.isState }.isFalse()
             }
         }
-        test("ReplicaCount") {
+        test("Replica Count") {
             val manifest = KubernetesManifest().apply {
                 apiVersion = KubernetesApiVersion.fromString("spinnaker.io/v1alpha1")
                 put("metadata", mutableMapOf("annotations" to null))
-                kind = KubernetesKind.fromString("SpinnakerService")
+                kind = KubernetesKind.fromString("CronTab")
                 put(
                     "spec",
                     mapOf(
@@ -583,10 +583,10 @@ class CustomResourceHandlerTest : JUnit5Minutests {
                                 "type" to "Ready"
                             )
                         ),
-                        "availableReplicas" to 75,
-                        "readyReplicas" to 60,
-                        "replicas" to 114,
-                        "unavailableReplicas" to 39,
+                        "availableReplicas" to 100,
+                        "readyReplicas" to 62,
+                        "replicas" to 100,
+                        "unavailableReplicas" to 100,
                         "updatedReplicas" to 100
                     )
                 )
