@@ -372,8 +372,21 @@ class CustomResourceHandlerTest : JUnit5Minutests {
                 apiVersion = KubernetesApiVersion.fromString("spinnaker.io/v1alpha1")
                 put("metadata", mutableMapOf("annotations" to null))
                 kind = KubernetesKind.fromString("SpinnakerService")
-                put("spec", mapOf("replicas" to 5))
+                put(
+                    "spec",
+                    mapOf(
+                        "replicas" to 5,
+                        "container" to listOf(
+                            mapOf(
+                                "image" to "nginx:1.7.9",
+                                "imagePullPolicy" to "IfNotPresent",
+                                "name" to "nginx"
+                            )
+                        )
+                    )
+                )
                 put("status", mapOf("conditions" to emptyList<Any>()))
+            }
             }
 
             expectThat(nullPropertiesSubject.status(manifest)).isA<Manifest.Status>().and {
