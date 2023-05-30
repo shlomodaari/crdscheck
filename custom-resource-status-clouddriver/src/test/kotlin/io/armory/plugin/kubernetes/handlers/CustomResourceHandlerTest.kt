@@ -379,9 +379,9 @@ class CustomResourceHandlerTest : JUnit5Minutests {
             expectThat(nullPropertiesSubject.status(manifest)).isA<Manifest.Status>().and {
                 get { stable.isState }.isFalse()
                 get { stable.message }.isEqualTo("Waiting for all replicas to be updated")
-                get { available.isState }.isTrue()
+                get { available.isState }.isFalse()
                 get { paused.isState }.isFalse()
-                get { failed.isState }.isFalse()
+                get { failed.isState }.isTrue()
             }
         }
 
