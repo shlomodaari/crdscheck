@@ -367,23 +367,23 @@ class CustomResourceHandlerTest : JUnit5Minutests {
             }
         }
 
-/**        test("No replicas in status") {
-*            val manifest = KubernetesManifest().apply {
-*                apiVersion = KubernetesApiVersion.fromString("spinnaker.io/v1alpha1")
-*                put("metadata", mutableMapOf("annotations" to null))
-*                kind = KubernetesKind.fromString("SpinnakerService")
-*                put("spec", mapOf("replicas" to 5))
-*                put("status", mapOf("conditions" to emptyList<Any>()))
-*            }
-*
-*            expectThat(nullPropertiesSubject.status(manifest)).isA<Manifest.Status>().and {
-*                get { stable.isState }.isFalse()
-*                get { stable.message }.isEqualTo("Waiting for all replicas to be updated")
-*                get { available.isState }.isTrue()
-*                get { paused.isState }.isFalse()
-*                get { failed.isState }.isFalse()
-*            }
-*/        }
+        test("No replicas in status") {
+            val manifest = KubernetesManifest().apply {
+                apiVersion = KubernetesApiVersion.fromString("spinnaker.io/v1alpha1")
+                put("metadata", mutableMapOf("annotations" to null))
+                kind = KubernetesKind.fromString("SpinnakerService")
+                put("spec", mapOf("replicas" to 5))
+                put("status", mapOf("conditions" to emptyList<Any>()))
+            }
+
+            expectThat(unavailableSubjectCondition.status(manifest)).isA<Manifest.Status>().and {
+                get { stable.isState }.isFalse()
+                get { stable.message }.isEqualTo("Waiting for all replicas to be updated")
+                get { available.isState }.isTrue()
+                get { paused.isState }.isFalse()
+                get { failed.isState }.isFalse()
+            }
+        }
 
         test("No Replicas when none desired") {
             val manifest = KubernetesManifest().apply {
