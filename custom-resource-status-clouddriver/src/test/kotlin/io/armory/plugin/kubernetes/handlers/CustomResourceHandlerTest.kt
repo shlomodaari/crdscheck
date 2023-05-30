@@ -372,7 +372,7 @@ class CustomResourceHandlerTest : JUnit5Minutests {
                 apiVersion = KubernetesApiVersion.fromString("spinnaker.io/v1alpha1")
                 put("metadata", mutableMapOf("annotations" to null))
                 kind = KubernetesKind.fromString("SpinnakerService")
-                put("spec", mapOf("replicas" to 5))
+                put("spec", mapOf("replicas" to 0))
                 put("status", mapOf("conditions" to emptyList<Any>()))
             }
 
