@@ -367,7 +367,7 @@ class CustomResourceHandlerTest : JUnit5Minutests {
             }
         }
 
-        test("No replicas in status") {
+        test("No replicas checking when plugin is not configured ") {
             val manifest = KubernetesManifest().apply {
                 apiVersion = KubernetesApiVersion.fromString("spinnaker.io/v1alpha1")
                 put("metadata", mutableMapOf("annotations" to null))
@@ -376,10 +376,10 @@ class CustomResourceHandlerTest : JUnit5Minutests {
                 put("status", mapOf("conditions" to emptyList<Any>()))
             }
 
-            expectThat(unavailableSubjectCondition.status(manifest)).isA<Manifest.Status>().and {
-                get { stable.isState }.isFalse()
+            expectThat(nullPropertiesSubject.status(manifest)).isA<Manifest.Status>().and {
+                get { stable.isState }.isTrue()
                 get { stable.message }.isEqualTo("Waiting for all replicas to be updated")
-                get { available.isState }.isTrue()
+                get { available.isState }.isFalse()
                 get { paused.isState }.isFalse()
                 get { failed.isState }.isFalse()
             }
