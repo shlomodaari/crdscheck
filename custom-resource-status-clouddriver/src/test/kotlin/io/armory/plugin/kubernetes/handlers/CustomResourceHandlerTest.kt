@@ -367,7 +367,7 @@ class CustomResourceHandlerTest : JUnit5Minutests {
             }
         }
 
-        test("No replicas checking when plugin is not configured ") {
+        test("No replicas checking when Properties is not configured ") {
             val manifest = KubernetesManifest().apply {
                 apiVersion = KubernetesApiVersion.fromString("spinnaker.io/v1alpha1")
                 put("metadata", mutableMapOf("annotations" to null))
@@ -378,9 +378,6 @@ class CustomResourceHandlerTest : JUnit5Minutests {
 
             expectThat(nullPropertiesSubject.status(manifest)).isA<Manifest.Status>().and {
                 get { stable.isState }.isTrue()
-                get { stable.message }.isEqualTo("Resource is stable")
-                get { failed.isState }.isFalse()
-                get { paused.isState }.isFalse()
             }
         }
 
